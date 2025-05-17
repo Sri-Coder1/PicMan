@@ -6,6 +6,8 @@ const velocity = 2;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+let score = 0;
+
 const tileMap = new TileMap(tileSize);
 const pacman = tileMap.getPacman(velocity);
 const enemies = tileMap.getEnemies(velocity);
@@ -18,11 +20,21 @@ const gameWinSound = new Audio("sounds/gameWin.wav");
 tileMap.setCanvasSize(canvas);
 setInterval(gameLoop, 1000 / 75);
 
+document.getElementById("score-display").innerText = `Score: ${score}`;
+
+document.addEventListener('addScore', (e) => {
+  score += e.detail;
+  document.getElementById("score-display").innerText = `Score: ${score}`;
+});
+
 document.addEventListener("keydown", (event) => {
   if ((gameOver || gameWin) && (event.key === "r" || event.key === "R")) {
+    score = 0;
+    document.getElementById("score-display").innerText = `Score: ${score}`;
     location.reload();
   }
 });
+
 
 function gameLoop() {
   tileMap.draw(ctx);
