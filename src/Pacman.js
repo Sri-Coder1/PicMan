@@ -4,10 +4,12 @@ export default class Pacman {
   constructor(x, y, tileSize, velocity, tileMap) {
     this.x = x;
     this.y = y;
+    this.startX = x;
+    this.startY = y;
     this.tileSize = tileSize;
     this.velocity = velocity;
     this.tileMap = tileMap;
-
+    this.lives = 3;
     this.currentMovingDirection = null;
     this.requestedMovingDirection = null;
 
@@ -38,6 +40,14 @@ export default class Pacman {
     up: 3,
   };
 
+
+  loseLife()
+  {
+    this.lives--;
+    this.x = this.startX;
+    this.y = this.startY;
+    this.currentMovingDirection = null;
+  }
   draw(ctx, pause, enemies) {
     if (!pause) {
       this.#move();
