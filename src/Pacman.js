@@ -222,6 +222,7 @@ export default class Pacman {
     if (this.tileMap.eatDot(this.x, this.y) && this.madeFirstMove) {
       this.wakaSound.volume = 0.8;
       this.wakaSound.play();
+      document.dispatchEvent(new CustomEvent('addScore', { detail: 10 }));
     }
   }
 
@@ -254,6 +255,7 @@ export default class Pacman {
       collideEnemies.forEach((enemy) => {
       enemy.kill(); 
       this.eatGhostSound.play();
+      document.dispatchEvent(new CustomEvent('addScore', { detail: 50 }));
     });
     }
   }
