@@ -15,15 +15,38 @@ let gameWin = false;
 const gameOverSound = new Audio("sounds/gameOver.wav");
 const gameWinSound = new Audio("sounds/gameWin.wav");
 
+tileMap.setCanvasSize(canvas);
+setInterval(gameLoop, 1000 / 75);
+
+document.addEventListener("keydown", (event) => {
+  if ((gameOver || gameWin) && (event.key === "r" || event.key === "R")) {
+    location.reload();
+  }
+});
+
 function gameLoop() {
   tileMap.draw(ctx);
   drawGameEnd();
+
+  if (!pause()) {
+    enemies.forEach((enemy) => {
+      if (!pacman.powerDotActive && enemy.collideWith(pacman)) {
+        pacman.loseLife();
+        document.getElementById("livesCounter").innerText = `Lives: ${pacman.lives}`;
+
+        if (pacman.lives <= 0) {
+          gameOver = true;
+          gameOverSound.play();
+        }
+      }
+    });
+  }
+
   pacman.draw(ctx, pause(), enemies);
-  enemies.forEach(enemy => enemy.draw(ctx, pause(), pacman));
-  checkGameOver();
+  enemies.forEach((enemy) => enemy.draw(ctx, pause(), pacman));
+
   checkGameWin();
 }
-
 
 function checkGameWin() {
   if (!gameWin) {
@@ -32,21 +55,6 @@ function checkGameWin() {
       gameWinSound.play();
     }
   }
-}
-
-function checkGameOver() {
-  if (!gameOver) {
-    gameOver = isGameOver();
-    if (gameOver) {
-      gameOverSound.play();
-    }
-  }
-}
-
-function isGameOver() {
-  return enemies.some(
-    enemy => !pacman.powerDotActive && enemy.collideWith(pacman)
-  );
 }
 
 function pause() {
@@ -80,13 +88,3 @@ function drawGameEnd() {
     ctx.fillText(restartText, canvas.width / 2 - restartWidth / 2, canvas.height / 2 + 50);
   }
 }
-
-
-tileMap.setCanvasSize(canvas);
-setInterval(gameLoop, 1000 / 75);
-
-document.addEventListener("keydown", (event) => {
-  if ((gameOver || gameWin) && (event.key === "r" || event.key === "R")) {
-    location.reload();
-  }
-});
