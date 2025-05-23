@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d");
 let score = 0;
 
 const tileMap = new TileMap(tileSize);
-const pacman = tileMap.getPacman(velocity);
+const pacman = tileMap.getPacman(velocity, gamewin);
 const enemies = tileMap.getEnemies(velocity);
 
 let gameOver = false;
@@ -62,7 +62,7 @@ function gameLoop() {
 
 function checkGameWin() {
   if (!gameWin) {
-    gameWin = tileMap.didWin() || score > 7500;
+    gameWin = tileMap.didWin() || score > 8000;
     if (gameWin) {
       gameWinSound.play();
     }
