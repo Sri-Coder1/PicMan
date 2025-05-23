@@ -9,6 +9,7 @@ export default class Pacman {
     this.tileSize = tileSize;
     this.velocity = velocity;
     this.tileMap = tileMap;
+    this.gameWin = gameWin;
     this.lives = 3;
     this.currentMovingDirection = null;
     this.requestedMovingDirection = null;
@@ -219,6 +220,8 @@ export default class Pacman {
   }
 
   #eatDot() {
+
+    if (gameWin) return;
     if (this.tileMap.eatDot(this.x, this.y) && this.madeFirstMove) {
       this.wakaSound.volume = 0.8;
       this.wakaSound.play();
@@ -250,6 +253,8 @@ export default class Pacman {
   }
 
   #eatGhost(enemies) {
+
+    if (gameWin) return;
     if (this.powerDotActive) {
       const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
       collideEnemies.forEach((enemy) => {
