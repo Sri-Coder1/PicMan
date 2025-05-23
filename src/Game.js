@@ -62,7 +62,7 @@ function gameLoop() {
 
 function checkGameWin() {
   if (!gameWin) {
-    gameWin = tileMap.didWin();
+    gameWin = tileMap.didWin() || score > 7500;
     if (gameWin) {
       gameWinSound.play();
     }
