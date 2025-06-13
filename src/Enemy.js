@@ -3,12 +3,9 @@ import MovingDirection from "./MovingDirection.js";
 export default class Enemy {
   constructor(x, y, tileSize, velocity, tileMap, name = "pinky") {
 
-    this.spawnX = x;
-    this.spawnY = y;
-    this.isDead = false;
-    this.respawnTimerDefault = 180;
-    this.respawnTimer = 0;
-    this.color = name
+    this.startX = x; // Save initial position for regeneration
+    this.startY = y;
+    this.color = name;
     this.x = x;
     this.y = y;
     this.tileSize = tileSize;
@@ -27,17 +24,21 @@ export default class Enemy {
     this.scaredAboutToExpireTimerDefault = 10;
     this.scaredAboutToExpireTimer = this.scaredAboutToExpireTimerDefault;
 
-    this.isDead = false;
-    this.respawnTimerDefault = 100;
+    this.eaten = false; // Track if ghost is eaten
+    this.respawnTimerDefault = 60 * 5; // Frames to wait before respawn
     this.respawnTimer = 0;
   }
 
   draw(ctx, pause, pacman) {
-
-    if(this.isDead){
-      this.#handleRespawn();
-      return;
+    // Regenerate if eaten
+    if (this.eaten) {
+      this.respawnTimer--;
+      if (this.respawnTimer <= 0) {
+        this.respawn();
+      }
+      return; // Don't draw while regenerating
     }
+
     if (!pause) {
       this.#move();
       this.#changeDirection(pacman);
@@ -61,6 +62,8 @@ export default class Enemy {
     }
   }
   collideWith(pacman) {
+    if (this.eaten) return false; // Can't collide if regenerating
+
     const size = this.tileSize / 2;
     if (
       this.x < pacman.x + size &&
@@ -68,10 +71,26 @@ export default class Enemy {
       this.y < pacman.y + size &&
       this.y + size > pacman.y
     ) {
+      // If Pac-Man is powered up, ghost is eaten
+      if (pacman.powerDotActive) {
+        this.eaten = true;
+        this.respawnTimer = this.respawnTimerDefault;
+        // Optionally play a sound or increase score here
+        return false; // Don't count as collision for Pac-Man
+      }
       return true;
     } else {
       return false;
     }
+  }
+
+  respawn() {
+    this.x = this.startX;
+    this.y = this.startY;
+    this.eaten = false;
+    this.movingDirection = Math.floor(
+      Math.random() * Object.keys(MovingDirection).length
+    );
   }
 
   #setImage(ctx, pacman) {
@@ -167,7 +186,6 @@ export default class Enemy {
       }
     }
   }
-
 
   #move() {
     if (

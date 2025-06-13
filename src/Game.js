@@ -6,47 +6,34 @@ const velocity = 2;
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let score = 0;
-
 const tileMap = new TileMap(tileSize);
-const pacman = tileMap.getPacman(velocity, gamewin);
+const pacman = tileMap.getPacman(velocity);
 const enemies = tileMap.getEnemies(velocity);
 
 let gameOver = false;
 let gameWin = false;
 const gameOverSound = new Audio("sounds/gameOver.wav");
 const gameWinSound = new Audio("sounds/gameWin.wav");
-
-tileMap.setCanvasSize(canvas);
-setInterval(gameLoop, 1000 / 75);
-
-document.getElementById("score-display").innerText = `Score: ${score}`;
-
-document.addEventListener('addScore', (e) => {
-  score += e.detail;
-  document.getElementById("score-display").innerText = `Score: ${score}`;
-});
-
-document.addEventListener("keydown", (event) => {
-  if ((gameOver || gameWin) && (event.key === "r" || event.key === "R")) {
-    score = 0;
-    document.getElementById("score-display").innerText = `Score: ${score}`;
-    location.reload();
-  }
-});
-
+let score = 0;
+window.score = score;
 
 function gameLoop() {
   tileMap.draw(ctx);
   drawGameEnd();
 
+  // Check for collision with enemies before drawing Pacman
   if (!pause()) {
-    enemies.forEach((enemy) => {
+    enemies.forEach(enemy => {
       if (!pacman.powerDotActive && enemy.collideWith(pacman)) {
-        pacman.loseLife();
-        document.getElementById("livesCounter").innerText = `Lives: ${pacman.lives}`;
-
-        if (pacman.lives <= 0) {
+        if (pacman.lives > 1) {
+          pacman.loseLife();
+          // Reset Pacman to start position (assuming startX/startY exist)
+          pacman.x = pacman.startX;
+          pacman.y = pacman.startY;
+          pacman.currentMovingDirection = null;
+          pacman.requestedMovingDirection = null;
+        } else {
+          pacman.loseLife();
           gameOver = true;
           gameOverSound.play();
         }
@@ -55,14 +42,18 @@ function gameLoop() {
   }
 
   pacman.draw(ctx, pause(), enemies);
-  enemies.forEach((enemy) => enemy.draw(ctx, pause(), pacman));
-
+  enemies.forEach(enemy => enemy.draw(ctx, pause(), pacman));
   checkGameWin();
+
+  // Update lives counter on screen
+  document.getElementById("livesCounter").innerText = `Lives: ${pacman.lives}`;
+  score = window.score;
+  document.getElementById("scoreCounter").innerText = `Score: ${score}`;
 }
 
 function checkGameWin() {
   if (!gameWin) {
-    gameWin = tileMap.didWin() || score > 8000;
+    gameWin = tileMap.didWin();
     if (gameWin) {
       gameWinSound.play();
     }
@@ -100,3 +91,13 @@ function drawGameEnd() {
     ctx.fillText(restartText, canvas.width / 2 - restartWidth / 2, canvas.height / 2 + 50);
   }
 }
+
+
+tileMap.setCanvasSize(canvas);
+setInterval(gameLoop, 1000 / 75);
+
+document.addEventListener("keydown", (event) => {
+  if ((gameOver || gameWin) && (event.key === "r" || event.key === "R")) {
+    location.reload();
+  }
+});

@@ -4,13 +4,12 @@ export default class Pacman {
   constructor(x, y, tileSize, velocity, tileMap) {
     this.x = x;
     this.y = y;
-    this.startX = x;
-    this.startY = y;
+    this.startX = x; // Add this
+    this.startY = y; // Add this
     this.tileSize = tileSize;
     this.velocity = velocity;
     this.tileMap = tileMap;
-    this.gameWin = gameWin;
-    this.lives = 3;
+
     this.currentMovingDirection = null;
     this.requestedMovingDirection = null;
 
@@ -29,6 +28,9 @@ export default class Pacman {
 
     this.madeFirstMove = false;
 
+    // Add lives property
+    this.lives = 3;
+
     document.addEventListener("keydown", this.#keydown);
 
     this.#loadPacmanImages();
@@ -41,14 +43,6 @@ export default class Pacman {
     up: 3,
   };
 
-
-  loseLife()
-  {
-    this.lives--;
-    this.x = this.startX;
-    this.y = this.startY;
-    this.currentMovingDirection = null;
-  }
   draw(ctx, pause, enemies) {
     if (!pause) {
       this.#move();
@@ -220,12 +214,11 @@ export default class Pacman {
   }
 
   #eatDot() {
-
-    if (gameWin) return;
     if (this.tileMap.eatDot(this.x, this.y) && this.madeFirstMove) {
       this.wakaSound.volume = 0.8;
       this.wakaSound.play();
-      document.dispatchEvent(new CustomEvent('addScore', { detail: 10 }));
+      // Add 10 to score for yellow dot
+      window.score += 10;
     }
   }
 
@@ -236,6 +229,9 @@ export default class Pacman {
       this.powerDotAboutToExpire = false;
       this.timers.forEach((timer) => clearTimeout(timer));
       this.timers = [];
+
+      // Add 25 to score for power dot
+      window.score += 25;
 
       let powerDotTimer = setTimeout(() => {
         this.powerDotActive = false;
@@ -253,15 +249,20 @@ export default class Pacman {
   }
 
   #eatGhost(enemies) {
-
-    if (gameWin) return;
     if (this.powerDotActive) {
       const collideEnemies = enemies.filter((enemy) => enemy.collideWith(this));
       collideEnemies.forEach((enemy) => {
-      enemy.kill(); 
-      this.eatGhostSound.play();
-      document.dispatchEvent(new CustomEvent('addScore', { detail: 50 }));
-    });
+        // Add 50 to score for eating a ghost
+        window.score += 50;
+        this.eatGhostSound.play();
+      });
     }
+  }
+
+  loseLife() {
+    this.lives--;
+    // Optionally, reset Pacman's position here if needed
+    // this.x = this.startX;
+    // this.y = this.startY;
   }
 }
