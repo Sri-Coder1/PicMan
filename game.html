@@ -33,19 +33,42 @@
           rgb(176, 28, 28) 100%
         );
       }
+      #livesCounter {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        background: #200;
+        color: #FFD700;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2em;
+        padding: 6px 14px;
+        border-radius: 10px;
+        box-shadow: 0 0 12px #000;
+        z-index: 10;
+      }
+      #scoreCounter {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        background: #200;
+        color: #FFD700;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2em;
+        padding: 6px 14px;
+        border-radius: 10px;
+        box-shadow: 0 0 12px #000;
+        z-index: 10;
+        text-align: right;
+      }
     </style>
   </head>
   <body>
     <div>
       <h1>Pic-Man</h1>
       <canvas id="gameCanvas"></canvas>
+      <div id="livesCounter">Lives: 3</div>
+      <div id="scoreCounter">Score: 0</div>
     </div>
-    <div style="position: absolute; left: 30px; top: 40px; font-family: 'Press Start 2P'; font-size: 20px; background-color: #5e0f0f; padding: 10px 15px; color: yellow; border-radius: 8px; box-shadow: 0 0 10px black;" id="livesCounter">
-  Lives: 3
-</div>
-
-<div style="position: absolute; right: 30px; top: 40px; font-family: 'Press Start 2P'; font-size: 20px; background-color: #5e0f0f; padding: 10px 15px; color: yellow; border-radius: 8px; box-shadow: 0 0 10px black;"id="score-display">Score: 0</div>
-
     <script src="src/Game.js" type="module">
       console.warn("If you're seeing a blank screen, please run this via Live Server or a local dev server.");
     </script>
